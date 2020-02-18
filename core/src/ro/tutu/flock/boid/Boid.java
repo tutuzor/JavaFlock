@@ -7,7 +7,6 @@ import com.badlogic.gdx.math.Vector2;
 import ro.tutu.flock.FlockExperiment;
 import ro.tutu.flock.utils.RandomUtils;
 
-import java.util.List;
 import java.util.Random;
 
 public class Boid extends Sprite{
@@ -22,14 +21,14 @@ public class Boid extends Sprite{
         super(new Texture(BOID_IMAGE));
         this.index = index;
         this.batch = batch;
-        this.setSize(BOID_WIDTH, BOID_HEIGHT);
-        this.setScale(BOID_WIDTH, BOID_HEIGHT);
+        //this.setSize(BOID_WIDTH, BOID_HEIGHT);
+        //this.setScale(BOID_WIDTH, BOID_HEIGHT);
         this.setPosition(
                 new Random().nextInt(FlockExperiment.WIDTH - BOID_WIDTH),
                 new Random().nextInt(FlockExperiment.HEIGHT - BOID_HEIGHT)
         );
         this.velocity = new Vector2(RandomUtils.RandomFloat(), RandomUtils.RandomFloat());
-        System.out.println("Size:  --- "+ this.getHeight());
+        System.out.println("Size:  --- "+ this.getX() + " --- " + this.getY());
     }
 
     public void edges(){
@@ -41,10 +40,9 @@ public class Boid extends Sprite{
     }
 
     public void draw(){
-        this.setRotation(this.velocity.angle());
+        this.setRotation(this.velocity.angle() - 90);
         this.setPosition(this.getX() + this.velocity.x, this.getY() + this.velocity.y);
         this.draw(batch);
-        //batch.draw(this, this.getX(), this.getY(), BOID_WIDTH, BOID_HEIGHT);
     }
 
 }
