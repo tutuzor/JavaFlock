@@ -1,7 +1,5 @@
 package ro.tutu.flock.boid;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -12,84 +10,41 @@ import ro.tutu.flock.utils.RandomUtils;
 import java.util.List;
 import java.util.Random;
 
-public class Boid {
+public class Boid extends Sprite{
     private static final String BOID_IMAGE = "boid.png";
-    private static final int HEIGHT = 10;
-    private static final int WIDTH  = 10;
-    private final Texture img;
+    private static final int BOID_HEIGHT = 10;
+    private static final int BOID_WIDTH = 10;
     private final SpriteBatch batch;
-    private final OrthographicCamera cam;
-    private final Sprite sprite;
-    private Vector2 postition;
     private Vector2 velocity;
-    private Vector2 acceleration;
     private int index;
-    private int maxSpeed = 2;
 
-    public Boid(int index, SpriteBatch batch, OrthographicCamera cam){
+    public Boid(int index, SpriteBatch batch){
+        super(new Texture(BOID_IMAGE));
         this.index = index;
-        this.img = new Texture(BOID_IMAGE);
         this.batch = batch;
-        this.cam = cam;
-        this.sprite = new Sprite(this.img);
-        this.sprite.setSize(WIDTH, HEIGHT);
-        this.postition = new Vector2(new Random().nextInt(FlockExperiment.WIDTH),
-                new Random().nextInt(FlockExperiment.HEIGHT));
+        this.setSize(BOID_WIDTH, BOID_HEIGHT);
+        this.setScale(BOID_WIDTH, BOID_HEIGHT);
+        this.setPosition(
+                new Random().nextInt(FlockExperiment.WIDTH - BOID_WIDTH),
+                new Random().nextInt(FlockExperiment.HEIGHT - BOID_HEIGHT)
+        );
         this.velocity = new Vector2(RandomUtils.RandomFloat(), RandomUtils.RandomFloat());
-        this.acceleration = new Vector2();
+        System.out.println("Size:  --- "+ this.getHeight());
     }
 
     public void edges(){
-        if(this.postition.x > FlockExperiment.WIDTH)
-            this.postition.set(0f, this.postition.y);
-        else if(this.postition.x < 0)
-            this.postition.set(FlockExperiment.WIDTH, this.postition.y);
-        if(this.postition.y > FlockExperiment.HEIGHT)
-            this.postition.set(this.postition.x, 0f);
-        else if(this.postition.y < 0)
-            this.postition.set(this.postition.x, FlockExperiment.HEIGHT);
+        if(this.getX() > FlockExperiment.WIDTH - BOID_WIDTH) this.setPosition(BOID_WIDTH, this.getY());
+        else if(this.getX() < 0) this.setPosition(FlockExperiment.WIDTH - BOID_WIDTH, this.getY());
+
+        if(this.getY() > FlockExperiment.HEIGHT + BOID_HEIGHT) this.setPosition(this.getX(), BOID_HEIGHT);
+        else if(this.getY() < 0) this.setPosition(this.getX(), FlockExperiment.HEIGHT - BOID_HEIGHT);
     }
 
     public void draw(){
-        batch.setProjectionMatrix(cam.combined);
-        this.postition.add(this.velocity);
-        this.velocity.add(this.acceleration);
-        this.velocity.limit(this.maxSpeed);
-        this.acceleration.scl(0f);
-        sprite.setRotation(this.velocity.angle() - 90);
-        sprite.setPosition(this.postition.x, this.postition.y);
-        this.sprite.draw(batch);
+        this.setRotation(this.velocity.angle());
+        this.setPosition(this.getX() + this.velocity.x, this.getY() + this.velocity.y);
+        this.draw(batch);
+        //batch.draw(this, this.getX(), this.getY(), BOID_WIDTH, BOID_HEIGHT);
     }
 
-    public void align(List<Boid> boids){
-        float perceptionRadius = 10f;
-        Vector2 result = new Vector2();
-        int total = 0;
-        for (Boid other : boids){
-            if(index != other.getIndex() && Vector2.dst(this.postition.x, this.postition.y, other.getPosition().x,
-                    other.getPosition().y) < perceptionRadius){
-                result.add(other.getVelocity());
-                total++;
-            }
-        }
-        result.scl(-total);
-        result.sub(this.getVelocity());
-        this.acceleration.set(result);
-    }
-
-    public Vector2 getVelocity() {
-        return velocity;
-    }
-
-    public Vector2 getPosition(){
-        return postition;
-    }
-
-    public int getIndex(){
-        return index;
-    }
-
-    public void dispose(){
-        img.dispose();
-    }
 }
