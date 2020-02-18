@@ -23,16 +23,14 @@ public class FlockExperiment extends ApplicationAdapter {
 		for(int i=0; i<10; i++){
 			this.boidList.add(new Boid(i ,batch));
 		}
+		this.boidList.forEach(boid -> boid.setBoids(this.boidList));
 	}
 
 	@Override
 	public void render () {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		batch.begin();
-		boidList.forEach(boid -> {
-		    boid.edges();
-		    boid.draw();
-        });
+		boidList.forEach(Boid::draw);
 		batch.end();
 	}
 	
