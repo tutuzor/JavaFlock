@@ -24,8 +24,8 @@ public class Boid extends Sprite{
     private static final int COHESION_PERCEPTION = 30;
     private static final int SEPARATION_PERCEPTION = 50;
 
-    private static final float ALIGNMENT_PERCENT = 0.5f;
-    private static final float COHESION_PERCENT = 0.5f;
+    private static final float ALIGNMENT_PERCENT = 1f;
+    private static final float COHESION_PERCENT = 1f;
     private static final float SEPARATION_PERCENT = 2f;
 
     private final SpriteBatch batch;
@@ -110,8 +110,7 @@ public class Boid extends Sprite{
         return steering;
     }
 
-    public void draw(){
-        this.edges();
+    private void flock(){
         this.setNearBoids(ALIGNMENT_PERCEPTION);
         Vector2 alignment = this.alignment().scl(ALIGNMENT_PERCENT);
         this.setNearBoids(COHESION_PERCEPTION);
@@ -122,6 +121,12 @@ public class Boid extends Sprite{
         this.acceleration.add(alignment);
         this.acceleration.add(cohesion);
         this.acceleration.add(separation);
+    }
+
+    public void draw(){
+        this.edges();
+
+        this.flock();
 
         this.velocity.add(this.acceleration);
         this.velocity.limit(MAX_SPEED);
